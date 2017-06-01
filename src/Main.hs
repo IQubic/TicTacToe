@@ -1,7 +1,7 @@
 module Main where
 import Data.Array
 
-data Piece = X | O | Blank
+data Piece = X | O | Blank deriving (Eq, Show)
 
 type Board = Array (Int, Int) Piece
 
