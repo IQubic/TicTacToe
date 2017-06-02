@@ -41,7 +41,7 @@ takeInput :: (String -> Maybe a) -> String -> IO a
 takeInput parser errorMsg = do input <- getLine
                                case parser input of
                                  Just num -> pure num
-                                 Nothing -> putStr errorMsg >> takeInput parse errorMsg
+                                 Nothing -> putStr errorMsg >> takeInput parser errorMsg
 
 takeMove :: Int -> IO (Int, Int)
 takeMove size = do putStr "Enter a row: "
