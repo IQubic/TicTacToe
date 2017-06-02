@@ -23,10 +23,10 @@ showPiece Blank = ' '
 
 showBoard :: Board -> String
 showBoard b = unlines $ intersperse hLines rows
-              where pieces = map showPiece $ elems b
-                    size = getBoardSize b
+              where hLines = replicate (size * 2 - 1) '-'
                     rows = map (intersperse '|') $ chunksOf size pieces
-                    hLines = replicate (size * 2 - 1) '-'
+                    pieces = map showPiece $ elems b
+                    size = getBoardSize b
 
 main :: IO ()
 main = putStrLn "hello world"
