@@ -1,4 +1,6 @@
 module Main where
+import Control.Monad
+import Text.Read
 import Data.List
 import Data.List.Split
 import Data.Array
@@ -27,6 +29,10 @@ showBoard b = unlines $ intersperse hLines rows
                     rows = map (intersperse '|') $ chunksOf size pieces
                     pieces = map showPiece $ elems b
                     size = getBoardSize b
+
+parseInput :: Int -> String -> Maybe Int
+parseInput size input = maybeNum >>= \num -> guard (0 <= num && num < size) >> pure num
+  where maybeNum = readMaybe input :: Maybe Int
 
 main :: IO ()
 main = putStrLn "hello world"
