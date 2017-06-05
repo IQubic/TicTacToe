@@ -18,18 +18,19 @@ mkMove :: Board -> (Int, Int) -> Piece -> Board
 mkMove board spot piece = board // [(spot, piece)]
 
 getBoardSize :: Board -> (Int, Int)
-getBoardSize board = (fst size + 1, snd size + 1)
-  where size = snd $ bounds board
+getBoardSize board = (colLength + 1, rowLength + 1)
+  where (colLength, rowLength) = snd $ bounds board
 
 isOnBoard :: Board -> (Int, Int) -> Bool
 isOnBoard board = inRange (bounds board)
 
-isValidMove :: Board -> (Int, Int) -> Bool
-isValidMove board spot = board ! spot == Blank
-
 checkForWinner :: (Int, Int) -> Int -> Board -> Winner
-checkForWinner spot runLength board = _
+checkForWinner spot runLength board
+  | any (>= runLength) lineLengths = if lastPlayer == X then XWon else OWon
+  | Blank `elem` elems board = StillPlaying
+  | otherwise = Tie
   where lastPlayer = board ! spot
+        lineLengths = map lineCount [(-1, -1), (-1, 0), (-1, 1), (0, 1)]
         lineCount dir@(dirX, dirY) = scanDir dir + scanDir (negate dirX, negate dirY) - 1
         scanDir dir = checkDir spot dir lastPlayer 0 board
 
@@ -45,10 +46,13 @@ showPiece Blank = ' '
 
 showBoard :: Board -> String
 showBoard b = unlines $ intersperse hLines rows
-              where hLines = replicate (colNum * 2 - 1) '-'
-                    rows = map (intersperse '|') $ chunksOf colNum pieces
+              where hLines = replicate (rowLength * 2 - 1) '-'
+                    rows = map (intersperse '|') $ chunksOf rowLength pieces
                     pieces = map showPiece $ elems b
-                    colNum = snd $ getBoardSize b
+                    rowLength = snd $ getBoardSize b
+
+isValidMove :: Board -> (Int, Int) -> Bool
+isValidMove board spot = board ! spot == Blank
 
 parseInput :: Int -> String -> Maybe Int
 parseInput size input = maybeNum >>= \num -> guard (0 <= num && num < size) >> pure num
@@ -75,8 +79,22 @@ takeValidMove board = do move <- takeMove $ getBoardSize board
                          if isValidMove board move then return move else putStrLn "Invalid Move. Try Again:" >> takeValidMove board
 
 main :: IO ()
-main = do board <- pure $ mkNewBoard 3 4
+main = do board <- pure $ mkNewBoard 3 3
           putStrLn (showBoard board)
           move <- takeValidMove board
           board' <- pure $ mkMove board move X
           putStrLn (showBoard board')
+
+gameLoop :: Int -> Board -> Piece -> IO ()
+gameLoop runLength state piece = do putStrLn $ showBoard state
+                                    move <- takeValidMove state
+                                    state' <- pure $ mkMove state move piece
+                                    winner <- pure $ checkForWinner move runLength state'
+                                    case winner of
+                                      XWon -> putStrLn "X Won"
+                                      OWon -> putStrLn "O Won"
+                                      Tie  -> putStrLn "Tie Game"
+                                      StillPlaying -> if piece == X
+                                                      then nextTurn state' O
+                                                      else nextTurn state' X
+         where nextTurn newState nextPlayer = putStrLn (show nextPlayer ++ " to play:") >> gameLoop runLength newState nextPlayer
