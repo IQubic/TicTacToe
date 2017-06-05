@@ -80,21 +80,18 @@ takeValidMove board = do move <- takeMove $ getBoardSize board
 
 main :: IO ()
 main = do board <- pure $ mkNewBoard 3 3
-          putStrLn (showBoard board)
-          move <- takeValidMove board
-          board' <- pure $ mkMove board move X
-          putStrLn (showBoard board')
+          gameLoop 3 board X
 
 gameLoop :: Int -> Board -> Piece -> IO ()
-gameLoop runLength state piece = do putStrLn $ showBoard state
+gameLoop runLength state piece = do putStrLn $ showPiece piece:" to play:"
+                                    putStr $ showBoard state
                                     move <- takeValidMove state
                                     state' <- pure $ mkMove state move piece
                                     winner <- pure $ checkForWinner move runLength state'
                                     case winner of
-                                      XWon -> putStrLn "X Won"
-                                      OWon -> putStrLn "O Won"
-                                      Tie  -> putStrLn "Tie Game"
+                                      XWon -> putStrLn (showBoard state') >> putStr "X Won"
+                                      OWon -> putStrLn (showBoard state') >> putStr "O Won"
+                                      Tie  -> putStrLn (showBoard state') >> putStr "Tie"
                                       StillPlaying -> if piece == X
-                                                      then nextTurn state' O
-                                                      else nextTurn state' X
-         where nextTurn newState nextPlayer = putStrLn (show nextPlayer ++ " to play:") >> gameLoop runLength newState nextPlayer
+                                                      then gameLoop runLength state' O
+                                                      else gameLoop runLength state' X
