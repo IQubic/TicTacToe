@@ -54,10 +54,6 @@ showBoard b = unlines $ intersperse hLines rows
 isValidMove :: Board -> (Int, Int) -> Bool
 isValidMove board spot = board ! spot == Blank
 
-parseInput :: Int -> String -> Maybe Int
-parseInput size input = maybeNum >>= \num -> guard (0 <= num && num < size) >> pure num
-  where maybeNum = readMaybe input :: Maybe Int
-
 takeInput :: (String -> Maybe a) -> String -> IO a
 takeInput parser errorMsg = do input <- getLine
                                case parser input of
@@ -72,6 +68,7 @@ takeMove size = do putStr "Enter a row: "
                    return (row, col)
                      where parseRow = parseInput $ fst size
                            parseCol = parseInput $ snd size
+                           parseInput limit input = (readMaybe input :: Maybe Int) >>= \num -> guard (0 <= num && num < limit) >> pure num
                            errorMsg s = "Invalid " ++ s ++ ". Try again: "
 
 takeValidMove :: Board -> IO (Int, Int)
