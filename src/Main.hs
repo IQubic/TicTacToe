@@ -86,8 +86,8 @@ gameLoop :: Int -> Board -> Piece -> IO ()
 gameLoop runLength state piece = do putStrLn $ showPiece piece:" to play:"
                                     putStr $ showBoard state
                                     move <- takeValidMove state
-                                    state' <- pure $ mkMove state move piece
-                                    winner <- pure $ checkForWinner move runLength state'
+                                    let state' = mkMove state move piece
+                                    let winner = checkForWinner move runLength state'
                                     case winner of
                                       XWon -> putStrLn (showBoard state') >> putStr "X Won"
                                       OWon -> putStrLn (showBoard state') >> putStr "O Won"
