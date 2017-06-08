@@ -86,9 +86,9 @@ gameLoop runLength state piece = do putStrLn $ showPiece piece:" to play:"
                                     let state' = mkMove state move piece
                                     let winner = checkForWinner move runLength state'
                                     case winner of
-                                      XWon -> putStrLn (showBoard state') >> putStr "X Won"
-                                      OWon -> putStrLn (showBoard state') >> putStr "O Won"
-                                      Tie  -> putStrLn (showBoard state') >> putStr "Tie"
+                                      XWon -> putStrLn (showBoard state') >> putStrLn "X Wins!"
+                                      OWon -> putStrLn (showBoard state') >> putStrLn "O Wins!"
+                                      Tie  -> putStrLn (showBoard state') >> putStrLn "Tie"
                                       StillPlaying -> if piece == X
                                                       then gameLoop runLength state' O
                                                       else gameLoop runLength state' X
