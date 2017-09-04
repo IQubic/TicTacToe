@@ -75,6 +75,7 @@ takeValidMove :: Board -> IO (Int, Int)
 takeValidMove board = do move <- takeMove $ getBoardSize board
                          if isValidMove board move then return move else putStrLn "Invalid Move. Try Again:" >> takeValidMove board
 
+
 main :: IO ()
 main = do let board = mkNewBoard 3 3
           gameLoop 3 board X
